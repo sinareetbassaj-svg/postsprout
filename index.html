@@ -1,0 +1,485 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#246b50">
+<title>PostSprout Studio — Social post maker</title>
+<style>
+:root{--green:#246b50;--green2:#eaf4ee;--ink:#1e2924;--muted:#68746d;--line:#e3e9e5;--bg:#f7f9f7;--card:#fff;--radius:18px}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);font:15px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;color:var(--ink)}
+button,input,select,textarea{font:inherit}button{cursor:pointer}button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid #a8d7bb;outline-offset:2px}
+header{background:#fff;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:5}.head{max-width:1120px;margin:auto;padding:14px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.brand{display:flex;align-items:center;gap:10px;font-size:20px;font-weight:800;letter-spacing:-.6px}.logo{display:grid;place-items:center;background:var(--green);color:white;width:38px;height:38px;border-radius:12px;font-size:21px}
+nav{display:flex;gap:6px;flex-wrap:wrap}.navbtn{border:0;background:transparent;padding:9px 12px;border-radius:10px;color:var(--muted);font-weight:650}.navbtn.active,.navbtn:hover{background:var(--green2);color:var(--green)}
+main{max-width:1120px;margin:30px auto;padding:0 20px 50px}.hero{margin:0 0 22px}.eyebrow{color:var(--green);font-weight:800;font-size:11px;letter-spacing:1.4px;text-transform:uppercase}.hero h1{font-size:clamp(28px,4vw,42px);line-height:1.12;letter-spacing:-1.4px;margin:8px 0}.hero p{margin:8px 0;color:var(--muted);max-width:650px}
+.layout{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(300px,.95fr);gap:20px;align-items:start}.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:22px;box-shadow:0 4px 16px #183c2410}.card h2{font-size:18px;margin:0 0 4px;letter-spacing:-.3px}.sub{color:var(--muted);font-size:13px;margin:0 0 18px}
+label{display:block;font-size:13px;font-weight:750;margin:0 0 6px}.field{margin-bottom:14px}input,select,textarea{width:100%;border:1px solid #dbe3dd;border-radius:11px;padding:11px 12px;background:#fff;color:var(--ink)}textarea{min-height:82px;resize:vertical}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:12px}.primary{border:0;border-radius:11px;background:var(--green);color:#fff;padding:12px 16px;font-weight:750}.primary:hover{background:#1b593f}.secondary{border:1px solid #d5e0d8;border-radius:11px;background:#fff;color:var(--green);padding:10px 13px;font-weight:700}.smallbtn{padding:8px 10px;font-size:13px}.full{width:100%}.actions{display:flex;gap:8px;flex-wrap:wrap}.notice{padding:10px 12px;background:var(--green2);color:#20543d;border-radius:10px;font-size:13px;margin-top:12px;display:none}
+.preview-wrap{background:#f0f3f0;border:1px dashed #d6dfd8;border-radius:15px;padding:14px;display:grid;place-items:center;min-height:340px}
+.poster{width:min(100%,340px);aspect-ratio:4/5;background:#eaf4ee;border-radius:8px;padding:27px 24px;display:flex;flex-direction:column;justify-content:space-between;box-shadow:0 8px 20px #1b3d241a;overflow:hidden;position:relative;color:#18392a}
+.poster:before{content:"";position:absolute;width:180px;height:180px;border-radius:50%;background:#d1e7d8;right:-55px;top:-55px}.poster>*{position:relative}.poster .postbrand{font-size:12px;letter-spacing:1.4px;text-transform:uppercase;font-weight:800}.poster .posttag{font-size:11px;text-transform:uppercase;letter-spacing:1.3px;opacity:.72}.poster h3{font-size:clamp(26px,4vw,35px);line-height:1.06;letter-spacing:-1px;margin:10px 0}.poster p{font-size:14px;line-height:1.45;margin:0}.poster .cta{display:inline-block;align-self:flex-start;background:#246b50;color:#fff;border-radius:100px;padding:10px 14px;font-weight:750;font-size:12px;margin-top:18px}.poster .foot{font-size:10px;opacity:.7;margin-top:18px}
+.templates{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}.template{border:1px solid var(--line);border-radius:10px;padding:10px 8px;background:#fff;text-align:center;font-size:12px;font-weight:700;color:var(--muted)}.template.active{border-color:var(--green);background:var(--green2);color:var(--green)}
+.template .swatch{height:28px;border-radius:6px;margin-bottom:7px}.saved-list{display:grid;gap:10px}.saved-item{border:1px solid var(--line);border-radius:12px;padding:13px;display:flex;justify-content:space-between;gap:12px;align-items:center}.saved-item strong{display:block}.saved-item small{color:var(--muted)}
+.empty{border:1px dashed #d6dfd8;border-radius:12px;padding:22px;text-align:center;color:var(--muted)}
+footer{text-align:center;color:var(--muted);font-size:12px;padding:0 20px 28px}.hidden{display:none!important}.pill{display:inline-block;background:#eef4ef;color:#286147;padding:4px 8px;border-radius:100px;font-size:11px;font-weight:800}
+@media(max-width:780px){.layout{grid-template-columns:1fr}.head{align-items:flex-start;flex-direction:column}.head nav{width:100%}.navbtn{flex:1;padding:8px 5px;font-size:13px}main{margin-top:22px;padding:0 14px 36px}.card{padding:17px}.preview-wrap{min-height:320px}}
+@media(max-width:400px){.two{grid-template-columns:1fr;gap:0}.hero h1{letter-spacing:-.8px}.poster{padding:23px 20px}}
+
+/* PostSprout Studio polish */
+:root{
+ --green:#176b57;--green2:#e4f5ef;--ink:#172b2a;--muted:#6c7d7b;
+ --line:#e4ebe8;--bg:#f5f8f7;--card:#ffffff;--radius:20px
+}
+body{background:radial-gradient(ellipse at 85% 0%,#e8f5ef 0%,transparent 34%),var(--bg);color:var(--ink);letter-spacing:-.12px}
+header{background:rgba(255,255,255,.88);backdrop-filter:blur(18px);border-bottom:1px solid #e5eeea}
+.head{padding-top:12px;padding-bottom:12px}
+.brand{font-size:21px;letter-spacing:-.8px;gap:11px}
+.logo{background:linear-gradient(145deg,#18876b,#105544);width:42px;height:42px;border-radius:14px;box-shadow:0 6px 16px #176b5726}
+nav{gap:4px}
+.navbtn{padding:9px 13px;border-radius:12px;transition:background .18s,color .18s}
+.navbtn.active,.navbtn:hover{background:#e5f5ef;color:#12634f}
+main{margin-top:36px}
+.hero{padding:28px 30px 27px;margin-bottom:24px;border:1px solid #e2eee8;border-radius:24px;background:linear-gradient(115deg,#ffffffed 0%,#f0faf5ed 100%);box-shadow:0 12px 35px #193b2c08}
+.eyebrow{display:inline-flex;align-items:center;gap:7px;color:#16745b;font-size:11px;letter-spacing:1.5px}
+.eyebrow:before{content:"";width:7px;height:7px;border-radius:50%;background:#36b68c;box-shadow:0 0 0 4px #36b68c20}
+.hero h1{font-size:clamp(32px,4.3vw,48px);letter-spacing:-1.9px;margin:12px 0 9px;max-width:720px}
+.hero p{font-size:15px;line-height:1.7;max-width:620px}
+.layout{gap:22px}
+.card{border:1px solid #e5ece8;border-radius:21px;padding:24px;box-shadow:0 8px 28px #183b2c08;transition:box-shadow .2s,border-color .2s}
+.card h2{font-size:19px;letter-spacing:-.55px}
+.sub{line-height:1.6;margin-top:5px;margin-bottom:20px}
+label{font-size:12px;letter-spacing:.05px;color:#314a45}
+input,select,textarea{border-color:#dce7e1;border-radius:12px;padding:12px 13px;transition:border-color .15s,box-shadow .15s;background:#fff}
+input:hover,select:hover,textarea:hover{border-color:#b9d1c6}
+input:focus,select:focus,textarea:focus{border-color:#2d9a79;box-shadow:0 0 0 4px #2d9a7915;outline:none}
+.field{margin-bottom:16px}
+.primary,.secondary{border-radius:12px;transition:transform .15s,box-shadow .15s,background .15s}
+.primary{background:linear-gradient(135deg,#198366,#12634f);box-shadow:0 5px 12px #176b571c;padding:12px 17px}
+.primary:hover{background:linear-gradient(135deg,#147458,#0f5846);box-shadow:0 7px 16px #176b5725;transform:translateY(-1px)}
+.secondary{border-color:#dce7e1;color:#176b57;background:#fff}
+.secondary:hover{background:#f0faf5;border-color:#b9d8ca}
+button:active{transform:translateY(1px)}
+.preview-wrap{background:linear-gradient(145deg,#f3f8f5,#eaf2ee);border:1px solid #e1ebe5;border-radius:17px;padding:18px}
+.poster{border-radius:13px;box-shadow:0 16px 32px #153b2a1f}
+.templates{gap:10px}
+.template{border-color:#e3ebe6;border-radius:12px;padding:11px 9px;transition:border-color .15s,background .15s,transform .15s}
+.template:hover{transform:translateY(-1px);border-color:#9fcdb8}
+.template.active{border-color:#55a98a;background:#ecf8f2;color:#176b57;box-shadow:0 0 0 2px #55a98a12}
+.template .swatch{border:1px solid #00000008;border-radius:8px;height:32px}
+.notice{border:1px solid #cce8da;background:#eefaf4;color:#176247;border-radius:12px;padding:12px 13px}
+.pill{background:#e5f5ef;color:#176b57}
+.saved-item{border-color:#e4ece7;border-radius:14px;background:#fff}
+.empty{border-color:#d8e7df;background:#fbfdfc;border-radius:14px}
+#brandSummary.saved-item{padding:17px}
+footer{padding-top:10px}
+@media(max-width:780px){
+ main{margin-top:22px}
+ .hero{padding:22px 19px;border-radius:20px}
+ .hero h1{letter-spacing:-1.2px}
+ .card{padding:19px;border-radius:18px}
+ .head{gap:10px}
+ .navbtn{border-radius:10px}
+}
+@media(max-width:400px){
+ .hero{padding:19px 16px}
+ .hero h1{font-size:31px}
+}
+
+
+.hero-accent{background:linear-gradient(110deg,#176b57 0%,#39a77e 70%,#a0c94b 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero-chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+.hero-chips span{font-size:12px;font-weight:750;color:#245f4d;background:#e6f5ed;border:1px solid #d6eee1;padding:7px 11px;border-radius:999px}
+.feature-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:18px}
+.feature-tile{background:linear-gradient(145deg,#fff,#f4faf6);border:1px solid #e3eee7;border-radius:15px;padding:15px}
+.feature-tile .feature-icon{font-size:22px;margin-bottom:8px}
+.feature-tile strong{display:block;font-size:13px}
+.feature-tile small{display:block;color:var(--muted);font-size:12px;line-height:1.5;margin-top:4px}
+.idea-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:16px}
+.idea-card{border:1px solid #e0ebe4;background:linear-gradient(160deg,#fff,#f7fbf8);border-radius:16px;padding:17px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.idea-kicker{font-size:10px;font-weight:850;letter-spacing:1.2px;text-transform:uppercase;color:#218164}
+.idea-card h3{font-size:17px;line-height:1.25;letter-spacing:-.4px;margin:0}
+.idea-card p{font-size:13px;line-height:1.65;color:#53665e;margin:0;flex:1;overflow-wrap:anywhere}
+.idea-card .secondary{align-self:flex-start}
+.tag-cloud{display:flex;gap:7px;flex-wrap:wrap;margin-top:12px}
+.tag-chip{border:1px solid #dcebe2;background:#f1faf5;color:#176b57;padding:7px 10px;border-radius:999px;font-size:12px;font-weight:700}
+.planner-form{display:grid;grid-template-columns:1.2fr 1fr 1fr auto;gap:10px;align-items:end}
+.planner-form .field{margin:0}
+.planner-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;align-items:center}
+.planner-meta{display:flex;gap:7px;flex-wrap:wrap;margin-top:6px}
+.planner-meta span{font-size:11px;color:#587068;background:#f0f6f2;border-radius:999px;padding:4px 8px}
+.planner-actions{display:flex;gap:7px;flex-wrap:wrap}
+.status-select{width:auto;padding:7px 9px;font-size:12px}
+@media(max-width:780px){.feature-grid{grid-template-columns:1fr}.idea-grid{grid-template-columns:1fr}.planner-form{grid-template-columns:1fr 1fr}.planner-form .field:first-child{grid-column:1/-1}.hero-chips{gap:6px}}
+@media(max-width:420px){.planner-form{grid-template-columns:1fr}.planner-form .field:first-child{grid-column:auto}.planner-row{grid-template-columns:1fr}}
+
+</style>
+</head>
+<body>
+<header><div class="head">
+  <div class="brand"><span class="logo">✳</span><span>PostSprout</span></div>
+  <nav aria-label="Main navigation">
+    <button class="navbtn active" data-page="create">Create</button>
+    <button class="navbtn" data-page="templates">Templates</button>
+    <button class="navbtn" data-page="saved">Saved drafts <span id="savedCount"></span></button>
+    <button class="navbtn" data-page="ideas">Idea Lab</button>
+    <button class="navbtn" data-page="planner">Planner</button>
+    <button class="navbtn" data-page="brand">My Business</button>
+  </nav>
+</div></header>
+<main>
+<section class="hero">
+  <div class="eyebrow">YOUR LITTLE BUSINESS, BIG IDEAS</div>
+  <h1>Make your next post <span class="hero-accent">impossible to scroll past.</span></h1>
+  <p>Your pocket-sized creative studio for captions, campaign ideas, branded graphics, and a simple posting plan.</p>
+  <div class="hero-chips"><span>✦ Caption studio</span><span>◈ Design templates</span><span>↗ Content planner</span></div>
+</section>
+<section id="createPage">
+<div class="layout">
+  <div class="card">
+    <h2>Tell us what you're promoting</h2>
+    <p class="sub">Fill in a few details. You can edit the generated text afterward.</p>
+    <form id="promoForm">
+      <div class="field"><label for="business">Business name *</label><input id="business" placeholder="e.g. Sweet Corner" required maxlength="60"></div>
+      <div class="two">
+        <div class="field"><label for="type">Business type</label><select id="type"><option>Bakery or café</option><option>Clothing shop</option><option>Beauty business</option><option>Home business</option><option>Digital services</option><option>Other</option></select></div>
+        <div class="field"><label for="language">Language</label><select id="language"><option value="en">English</option><option value="ar">العربية</option><option value="fr">Français</option></select></div>
+      </div>
+      <div class="field"><label for="offer">Product, service, or offer *</label><input id="offer" placeholder="e.g. fresh cakes for the weekend" required maxlength="120"></div>
+      <div class="two">
+        <div class="field"><label for="audience">Who is it for?</label><input id="audience" placeholder="e.g. cake lovers" maxlength="80"></div>
+        <div class="field"><label for="tone">Tone</label><select id="tone"><option value="friendly">Friendly</option><option value="professional">Professional</option><option value="playful">Playful</option><option value="elegant">Elegant</option></select></div>
+      </div>
+      <div class="field"><label for="details">Extra details (optional)</label><textarea id="details" placeholder="Add real details you'd like customers to know. Don't include private information." maxlength="220"></textarea></div>
+      <button class="primary full" type="submit">✦ Create my post</button>
+      <div id="formNotice" class="notice" role="status"></div>
+    </form>
+  </div>
+  <div class="card">
+    <h2>Your post preview</h2><p class="sub">This is a preview. Edit the caption below before using it.</p>
+    <div class="preview-wrap">
+      <div class="poster" id="poster">
+        <div class="postbrand" id="pBrand">YOUR BUSINESS</div>
+        <div><div class="posttag" id="pTag">A LITTLE SOMETHING SPECIAL</div><h3 id="pHeadline">Your next great post starts here.</h3><p id="pCaption">Enter your business details, then choose “Create my post” to see your promotion.</p><span class="cta" id="pCta">DISCOVER MORE</span></div>
+        <div class="foot" id="pFoot">Made with PostSprout</div>
+      </div>
+    </div>
+    <div class="field" style="margin-top:15px"><label for="captionEdit">Edit caption</label><textarea id="captionEdit" placeholder="Your generated caption will appear here."></textarea></div>
+    <div class="field"><label for="headlineEdit">Edit headline</label><input id="headlineEdit" placeholder="Your headline"></div>
+    <div class="templates" id="miniTemplates">
+      <button class="template active" data-template="green"><div class="swatch" style="background:#eaf4ee"></div>Fresh</button>
+      <button class="template" data-template="cream"><div class="swatch" style="background:#f7eddb"></div>Warm</button>
+      <button class="template" data-template="dark"><div class="swatch" style="background:#202a25"></div>Bold</button>
+    </div>
+    <div class="actions" style="margin-top:14px">
+      <button class="secondary" id="copyBtn">Copy caption</button>
+      <button class="secondary" id="downloadBtn">Download PNG</button>
+      <button class="primary" id="saveBtn">Save draft</button>
+    </div>
+    <div id="actionNotice" class="notice" role="status"></div>
+  </div>
+</div>
+</section>
+<section id="templatesPage" class="hidden">
+  <div class="card"><h2>Choose a starting point</h2><p class="sub">Pick a style, then return to Create to customize it.</p>
+    <div class="templates" style="grid-template-columns:repeat(auto-fit,minmax(140px,1fr))" id="templateGallery">
+      <button class="template active" data-template="green"><div class="swatch" style="background:#eaf4ee"></div>Fresh & natural</button>
+      <button class="template" data-template="cream"><div class="swatch" style="background:#f7eddb"></div>Warm & welcoming</button>
+      <button class="template" data-template="dark"><div class="swatch" style="background:#202a25"></div>Bold & modern</button>
+    </div>
+    <button class="primary" style="margin-top:18px" id="backCreate">Use this style</button>
+  </div>
+</section>
+<section id="savedPage" class="hidden">
+  <div class="card"><h2>Your saved drafts</h2><p class="sub">Drafts are saved only in this browser on this device.</p><div id="savedList" class="saved-list"></div></div>
+</section>
+<section id="brandPage" class="hidden">
+  <div class="layout">
+    <div class="card">
+      <h2>My Business Profile</h2>
+      <p class="sub">Save your business details once, then reuse them when making new posts. This stays on this device.</p>
+      <form id="brandForm">
+        <div class="field"><label for="brandName">Business name *</label><input id="brandName" required maxlength="60" placeholder="e.g. Sweet Corner"></div>
+        <div class="field"><label for="brandType">Business type</label><select id="brandType"><option>Bakery or café</option><option>Clothing shop</option><option>Beauty business</option><option>Home business</option><option>Digital services</option><option>Other</option></select></div>
+        <div class="field"><label for="brandAudience">Typical customers</label><input id="brandAudience" maxlength="80" placeholder="e.g. local families, students"></div>
+        <div class="two">
+          <div class="field"><label for="brandLanguage">Preferred language</label><select id="brandLanguage"><option value="en">English</option><option value="ar">العربية</option><option value="fr">Français</option></select></div>
+          <div class="field"><label for="brandTone">Usual tone</label><select id="brandTone"><option value="friendly">Friendly</option><option value="professional">Professional</option><option value="playful">Playful</option><option value="elegant">Elegant</option></select></div>
+        </div>
+        <div class="field"><label for="brandDescription">What makes your business special? (optional)</label><textarea id="brandDescription" maxlength="220" placeholder="A short description you want to reuse. Avoid private details."></textarea></div>
+        <button class="primary full" type="submit">Save business profile</button>
+        <div id="brandNotice" class="notice" role="status"></div>
+      </form>
+    </div>
+    <div class="card">
+      <h2>Use your saved profile</h2>
+      <p class="sub">Fill the post form with your saved business details in one tap.</p>
+      <div id="brandSummary" class="empty">No business profile saved yet.</div>
+      <button id="useBrandBtn" class="primary full" style="margin-top:14px" type="button">Use profile to create a post</button>
+      <p class="sub" style="margin-top:14px">Business profile data is stored in this browser only. It does not sync to your other devices or an online account.</p>
+    </div>
+  </div>
+</section>
+
+<section id="ideasPage" class="hidden">
+  <div class="card">
+    <div class="eyebrow">Creative playground</div>
+    <h2 style="margin-top:8px">The Idea Lab ✦</h2>
+    <p class="sub">Get three different angles for the same offer, then send your favorite straight to the post editor. These are built-in creative suggestions, not live AI output.</p>
+    <div class="two">
+      <div class="field"><label for="ideaGoal">Campaign goal</label><select id="ideaGoal"><option value="sales">Promote an offer</option><option value="launch">Launch something new</option><option value="community">Build connection</option><option value="urgency">Create urgency</option><option value="education">Share a useful tip</option></select></div>
+      <div class="field"><label for="ideaPlatform">Where will you post?</label><select id="ideaPlatform"><option value="instagram">Instagram</option><option value="facebook">Facebook</option><option value="story">Story / short post</option><option value="linkedin">LinkedIn</option></select></div>
+    </div>
+    <button class="primary" id="makeIdeasBtn" type="button">✦ Find my angles</button>
+    <div id="ideasNotice" class="notice" role="status"></div>
+    <div id="ideaResults" class="idea-grid">
+      <div class="empty" style="grid-column:1/-1">Add a business and offer in Create, then come back here for campaign ideas.</div>
+    </div>
+  </div>
+  <div class="card" style="margin-top:18px">
+    <h2>Hashtag helper #</h2>
+    <p class="sub">Create a starter set from your business and offer. Check every tag before posting.</p>
+    <button class="secondary" id="makeTagsBtn" type="button">Suggest hashtags</button>
+    <div id="tagResults" class="tag-cloud"><span class="sub">Your suggested hashtags will appear here.</span></div>
+    <div class="actions" style="margin-top:14px"><button class="secondary" id="copyTagsBtn" type="button">Copy hashtags</button></div>
+    <div id="tagNotice" class="notice" role="status"></div>
+  </div>
+</section>
+<section id="plannerPage" class="hidden">
+  <div class="card">
+    <div class="eyebrow">Make consistency easier</div>
+    <h2 style="margin-top:8px">Your content planner ◷</h2>
+    <p class="sub">Plan upcoming posts and track their status. Plans are saved only in this browser on this device; this does not publish or schedule posts to social media.</p>
+    <form id="plannerForm" class="planner-form">
+      <div class="field"><label for="planTitle">Post idea *</label><input id="planTitle" maxlength="100" placeholder="e.g. Weekend cupcake special" required></div>
+      <div class="field"><label for="planDate">Planned date *</label><input id="planDate" type="date" required></div>
+      <div class="field"><label for="planPlatform">Platform</label><select id="planPlatform"><option>Instagram</option><option>Facebook</option><option>Story</option><option>LinkedIn</option><option>Other</option></select></div>
+      <button class="primary" type="submit">＋ Add plan</button>
+    </form>
+    <div id="plannerNotice" class="notice" role="status"></div>
+  </div>
+  <div class="card" style="margin-top:18px">
+    <div style="display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap">
+      <div><h2>Your upcoming posts</h2><p class="sub" style="margin:5px 0 0">Small steps, steady presence.</p></div>
+      <div class="actions"><button class="secondary smallbtn" id="exportPlannerBtn" type="button">Export CSV</button><button class="secondary smallbtn" id="clearPlannerBtn" type="button">Clear planner</button></div>
+    </div>
+    <div id="plannerList" class="saved-list" style="margin-top:16px"></div>
+  </div>
+</section>
+
+</main>
+<footer>PostSprout Studio · Your drafts, profile, and planner stay on this device. Review all copy, hashtags, and offer details before publishing.</footer>
+<script>
+const $=id=>document.getElementById(id);
+let currentTemplate='green', currentDraftId=null, currentData={business:'',offer:'',headline:'Your next great post starts here.',caption:'Enter your business details, then choose “Create my post” to see your promotion.',cta:'DISCOVER MORE',type:'',language:'en',audience:'',tone:'friendly',details:''};
+const palettes={green:{bg:'#eaf4ee',circle:'#d1e7d8',ink:'#18392a',accent:'#246b50',white:'#fff'},cream:{bg:'#f7eddb',circle:'#f0dcb8',ink:'#3b3022',accent:'#8d5c2b',white:'#fff'},dark:{bg:'#202a25',circle:'#344b3d',ink:'#f3f6f3',accent:'#a6d5b4',white:'#17231b'}};
+function notice(id,msg){const el=$(id);el.textContent=msg;el.style.display='block';setTimeout(()=>el.style.display='none',3200)}
+function generate(){
+ const business=$('business').value.trim(),offer=$('offer').value.trim();
+ if(!business||!offer){notice('formNotice','Please add your business name and what you are promoting.');return false}
+ currentData={business,offer,type:$('type').value,language:$('language').value,audience:$('audience').value.trim(),tone:$('tone').value,details:$('details').value.trim()};
+ const lang=currentData.language, tone=currentData.tone;
+ let headline,caption,cta,tag;
+ if(lang==='ar'){
+  headline='شيء مميز من '+business;
+  caption='اكتشفوا '+offer+' من '+business+'. '+(currentData.audience?'مصمم لكم يا '+currentData.audience+'. ':'')+(currentData.details?currentData.details+' ':'')+'تواصلوا معنا لمعرفة المزيد.';
+  cta='اكتشفوا المزيد';tag='شيء مميز لكم';
+ }else if(lang==='fr'){
+  headline='Une belle découverte chez '+business;
+  caption='Découvrez '+offer+' chez '+business+'. '+(currentData.audience?'Pensé pour '+currentData.audience+'. ':'')+(currentData.details?currentData.details+' ':'')+'Contactez-nous pour en savoir plus.';
+  cta='DÉCOUVRIR';tag='À DÉCOUVRIR';
+ }else{
+  const openers={friendly:'A little something to make your day:',professional:'Introducing from '+business+':',playful:'Good things are happening!',elegant:'Something special, thoughtfully chosen.'};
+  headline= tone==='professional' ? 'Discover '+offer : tone==='playful' ? 'Your next favorite? '+offer : tone==='elegant' ? 'A little more special.' : 'Something good is here.';
+  caption=openers[tone]+' '+offer+' at '+business+'. '+(currentData.audience?'Made with '+currentData.audience+' in mind. ':'')+(currentData.details?currentData.details+' ':'')+'Get in touch to learn more.';
+  cta=tone==='professional'?'LEARN MORE':tone==='playful'?'TAKE A LOOK':tone==='elegant'?'EXPLORE':'DISCOVER MORE';tag='MADE FOR YOUR DAY';
+ }
+ currentData.headline=headline;currentData.caption=caption;currentData.cta=cta;currentData.tag=tag;
+ $('headlineEdit').value=headline;$('captionEdit').value=caption;renderPoster();notice('formNotice','Your first draft is ready. You can edit the text before saving or downloading.');return true;
+}
+function renderPoster(){
+ const d=currentData; $('pBrand').textContent=d.business||'YOUR BUSINESS';$('pHeadline').textContent=$('headlineEdit').value||d.headline;$('pCaption').textContent=$('captionEdit').value||d.caption;$('pCta').textContent=d.cta||'DISCOVER MORE';$('pTag').textContent=d.tag||'A LITTLE SOMETHING SPECIAL';
+ const p=palettes[currentTemplate];$('poster').style.background=p.bg;$('poster').style.color=p.ink;$('poster').style.setProperty('--circle',p.circle);$('poster').style.setProperty('--accent',p.accent);
+ $('poster').querySelector(':before');$('poster').style.setProperty('background-color',p.bg);
+ const styleId='dynamicPalette';let st=$(styleId);if(!st){st=document.createElement('style');st.id=styleId;document.head.appendChild(st)}
+ st.textContent=`#poster:before{background:${p.circle}}#poster .cta{background:${p.accent};color:${currentTemplate==='dark'?'#17231b':'#fff'}}`;
+ $('savedCount').textContent=' ('+getDrafts().length+')';
+}
+$('promoForm').addEventListener('submit',e=>{e.preventDefault();generate()});
+$('captionEdit').addEventListener('input',renderPoster);$('headlineEdit').addEventListener('input',renderPoster);
+function chooseTemplate(name){currentTemplate=name;document.querySelectorAll('[data-template]').forEach(b=>b.classList.toggle('active',b.dataset.template===name));renderPoster()}
+document.querySelectorAll('[data-template]').forEach(b=>b.addEventListener('click',()=>chooseTemplate(b.dataset.template)));
+function getDrafts(){try{return JSON.parse(localStorage.getItem('postsprout_drafts')||'[]')}catch(e){return []}}
+function setDrafts(arr){localStorage.setItem('postsprout_drafts',JSON.stringify(arr));$('savedCount').textContent=' ('+arr.length+')'}
+$('saveBtn').addEventListener('click',()=>{
+ const business=$('business').value.trim(),offer=$('offer').value.trim();if(!business||!offer){notice('actionNotice','Add a business name and offer first.');return}
+ const d={...currentData,headline:$('headlineEdit').value,caption:$('captionEdit').value,template:currentTemplate,id:currentDraftId||String(Date.now()),updated:new Date().toLocaleString()};
+ const all=getDrafts().filter(x=>x.id!==d.id);all.unshift(d);setDrafts(all);currentDraftId=d.id;notice('actionNotice','Draft saved on this device.');
+});
+function showSaved(){const list=$('savedList'),items=getDrafts();list.innerHTML='';if(!items.length){list.innerHTML='<div class="empty">No drafts yet. Create a post and tap “Save draft”.</div>';return}
+ items.forEach(d=>{const row=document.createElement('div');row.className='saved-item';const info=document.createElement('div');const strong=document.createElement('strong');strong.textContent=d.business||'Untitled business';const small=document.createElement('small');small.textContent=(d.offer||'No offer')+' · '+(d.updated||'Saved draft');info.append(strong,small);const acts=document.createElement('div');acts.className='actions';const load=document.createElement('button');load.className='secondary smallbtn';load.textContent='Open';load.onclick=()=>loadDraft(d.id);const del=document.createElement('button');del.className='secondary smallbtn';del.textContent='Delete';del.onclick=()=>{setDrafts(getDrafts().filter(x=>x.id!==d.id));showSaved()};acts.append(load,del);row.append(info,acts);list.append(row)})
+}
+function loadDraft(id){const d=getDrafts().find(x=>x.id===id);if(!d)return;currentData=d;currentDraftId=d.id;$('business').value=d.business||'';$('offer').value=d.offer||'';$('type').value=d.type||'Other';$('language').value=d.language||'en';$('audience').value=d.audience||'';$('tone').value=d.tone||'friendly';$('details').value=d.details||'';$('headlineEdit').value=d.headline||'';$('captionEdit').value=d.caption||'';chooseTemplate(d.template||'green');showPage('create');notice('actionNotice','Draft opened.')}
+function showPage(page){['create','templates','saved','brand','ideas','planner'].forEach(p=>$(p+'Page').classList.toggle('hidden',p!==page));document.querySelectorAll('.navbtn').forEach(b=>b.classList.toggle('active',b.dataset.page===page));if(page==='saved')showSaved();if(page==='brand')renderBrandSummary();if(page==='planner')renderPlanner();window.scrollTo({top:0,behavior:'smooth'})}
+document.querySelectorAll('.navbtn').forEach(b=>b.addEventListener('click',()=>showPage(b.dataset.page)));$('backCreate').addEventListener('click',()=>showPage('create'));
+$('copyBtn').addEventListener('click',async()=>{const text=$('captionEdit').value;if(!text){notice('actionNotice','Create a post first.');return}try{await navigator.clipboard.writeText(text);notice('actionNotice','Caption copied.')}catch(e){$('captionEdit').focus();$('captionEdit').select();notice('actionNotice','Text selected. Use Copy from your device menu.')}});
+$('downloadBtn').addEventListener('click',()=>{
+ if(!$('business').value.trim()||!$('offer').value.trim()){notice('actionNotice','Create a post first.');return}
+ const canvas=document.createElement('canvas'),ctx=canvas.getContext('2d');canvas.width=900;canvas.height=1125;const p=palettes[currentTemplate];ctx.fillStyle=p.bg;ctx.fillRect(0,0,900,1125);ctx.fillStyle=p.circle;ctx.beginPath();ctx.arc(850,70,230,0,Math.PI*2);ctx.fill();ctx.fillStyle=p.ink;ctx.font='bold 28px Arial';ctx.fillText(($('business').value||'YOUR BUSINESS').toUpperCase().slice(0,34),70,105);ctx.fillStyle=p.accent;ctx.fillRect(70,155,80,7);
+ const wrap=(text,maxWidth,font,size,lineHeight,maxLines,baseY)=>{ctx.font=`${font} ${size}px Arial`;let words=text.split(/\s+/),lines=[],line='';for(const w of words){const test=line?line+' '+w:w;if(ctx.measureText(test).width>maxWidth&&line){lines.push(line);line=w}else line=test}if(line)lines.push(line);lines=lines.slice(0,maxLines);lines.forEach((l,i)=>ctx.fillText(l,70,baseY+i*lineHeight));return lines.length};
+ let headline=$('headlineEdit').value||'Your next great post starts here.';let used=wrap(headline,760,'bold',68,76,3,270);let captionY=320+used*76;ctx.fillStyle=p.ink;wrap($('captionEdit').value||'',740,'normal',34,48,6,captionY);let ctaY=850;ctx.fillStyle=p.accent;ctx.beginPath();ctx.roundRect(70,ctaY,300,72,36);ctx.fill();ctx.fillStyle=currentTemplate==='dark'?'#17231b':'#fff';ctx.font='bold 25px Arial';ctx.fillText(($('pCta').textContent||'DISCOVER MORE').slice(0,25),100,ctaY+45);ctx.fillStyle=p.ink;ctx.globalAlpha=.65;ctx.font='20px Arial';ctx.fillText('Made with PostSprout',70,1050);ctx.globalAlpha=1;
+ const a=document.createElement('a');a.download='postsprout-promotion.png';a.href=canvas.toDataURL('image/png');a.click();notice('actionNotice','PNG download started.');
+});
+renderPoster();$('savedCount').textContent=' ('+getDrafts().length+')';
+
+function getBrand(){try{return JSON.parse(localStorage.getItem('postsprout_brand')||'null')}catch(e){return null}}
+function renderBrandSummary(){
+ const b=getBrand(), box=$('brandSummary');
+ if(!b){box.className='empty';box.textContent='No business profile saved yet.';return}
+ box.className='saved-item';box.innerHTML='';
+ const info=document.createElement('div');
+ const title=document.createElement('strong');title.textContent=b.name;
+ const detail=document.createElement('small');detail.textContent=[b.type,b.language==='ar'?'Arabic':b.language==='fr'?'French':'English',b.audience].filter(Boolean).join(' · ');
+ const desc=document.createElement('p');desc.style.margin='8px 0 0';desc.style.color='var(--muted)';desc.textContent=b.description||'Your business profile is ready to use.';
+ info.append(title,detail,desc);box.append(info);
+}
+$('brandForm').addEventListener('submit',e=>{
+ e.preventDefault();
+ const name=$('brandName').value.trim();if(!name){notice('brandNotice','Please enter your business name.');return}
+ const b={name,type:$('brandType').value,audience:$('brandAudience').value.trim(),language:$('brandLanguage').value,tone:$('brandTone').value,description:$('brandDescription').value.trim(),updated:new Date().toLocaleString()};
+ localStorage.setItem('postsprout_brand',JSON.stringify(b));renderBrandSummary();notice('brandNotice','Business profile saved on this device.');
+});
+$('useBrandBtn').addEventListener('click',()=>{
+ const b=getBrand();if(!b){notice('brandNotice','Save your business profile first.');return}
+ $('business').value=b.name;$('type').value=b.type;$('language').value=b.language;$('audience').value=b.audience;$('tone').value=b.tone;$('details').value=b.description||'';
+ showPage('create');$('offer').focus();notice('formNotice','Business details filled in. Add the offer you want to promote.');
+});
+
+// IDEA LAB: local, rule-based campaign angles (no external AI service).
+function getWorkingData(){
+ const saved=currentData||{};
+ return {
+  business:$('business').value.trim()||saved.business||'Your business',
+  offer:$('offer').value.trim()||saved.offer||'something special',
+  audience:$('audience').value.trim()||saved.audience||'your community',
+  language:$('language').value||saved.language||'en',
+  details:$('details').value.trim()||saved.details||'',
+  tone:$('tone').value||saved.tone||'friendly'
+ };
+}
+function buildIdeas(){
+ const d=getWorkingData(),goal=$('ideaGoal').value,platform=$('ideaPlatform').value;
+ const isAr=d.language==='ar',isFr=d.language==='fr';
+ let ideas=[];
+ if(isAr){
+  ideas=[
+   {kind:'فضول',head:'في شيء حلو ناطرِكم ✨',caption:'اكتشفوا '+d.offer+' من '+d.business+'. '+(d.details?d.details+' ':'')+'خبرونا شو رأيكم!',tag:'ابدأوا الحديث'},
+   {kind:'قيمة',head:'لأنكم بتستاهلوا الأفضل',caption:'من '+d.business+' إلكن: '+d.offer+'. '+(d.audience?'فكرنا فيكم خصيصاً. ':'')+(d.details?d.details+' ':'')+'تواصلوا معنا للتفاصيل.',tag:'قيمة لكم'},
+   {kind:'دعوة',head:'خلّونا نكون جزء من يومكم',caption:'مرّوا على '+d.business+' واكتشفوا '+d.offer+'. شاركونا هاللحظة الحلوة!',tag:'أهلاً وسهلاً'}
+  ];
+  if(goal==='urgency'){ideas[0].head='ما تفوّتوا الفرصة';ideas[0].caption='اكتشفوا '+d.offer+' من '+d.business+'. تواصلوا معنا لمعرفة التوفّر والتفاصيل.'}
+  if(goal==='launch'){ideas[0].head='وصل الجديد!';ideas[0].caption='يسعدنا نقدّم لكم '+d.offer+' من '+d.business+'. كونوا من أوّل الناس اللي بيكتشفوه!'}
+ }else if(isFr){
+  ideas=[
+   {kind:'Curiosité',head:'Une petite surprise vous attend ✨',caption:'Découvrez '+d.offer+' chez '+d.business+'. '+(d.details?d.details+' ':'')+'Dites-nous ce que vous en pensez !',tag:'Lancez la conversation'},
+   {kind:'Valeur',head:'Une belle attention, pensée pour vous',caption:d.business+' vous propose '+d.offer+'. '+(d.audience?'Avec vous en tête, ':'')+(d.details?d.details+' ':'')+'Écrivez-nous pour en savoir plus.',tag:'Votre avantage'},
+   {kind:'Invitation',head:'On se retrouve bientôt ?',caption:'Passez chez '+d.business+' pour découvrir '+d.offer+'. Nous serions ravis de vous accueillir !',tag:'Vous êtes invités'}
+  ];
+  if(goal==='launch'){ideas[0].head='C’est nouveau !';ideas[0].caption='Découvrez en avant-première '+d.offer+' chez '+d.business+'. Soyez parmi les premiers !'}
+ }else{
+  ideas=[
+   {kind:'Curiosity hook',head:'Psst… you might love this 👀',caption:'Meet '+d.offer+' at '+d.business+'. '+(d.details?d.details+' ':'')+'Save this for later or send us a message to learn more.',tag:'A little discovery'},
+   {kind:'Value first',head:'A little something, made with you in mind.',caption:'At '+d.business+', we believe the details matter. Discover '+d.offer+'. '+(d.audience?'Created with '+d.audience+' in mind. ':'')+(d.details?d.details+' ':'')+'Message us for the details.',tag:'Made for you'},
+   {kind:'Community',head:'Let’s make this part of your story.',caption:'We would love to share '+d.offer+' with you at '+d.business+'. Tell us what you think, tag a friend, or stop by to say hello.',tag:'Come say hello'}
+  ];
+  if(goal==='launch'){ideas[0].head='New in the studio ✨';ideas[0].caption='It’s here! Meet '+d.offer+' from '+d.business+'. Be among the first to discover it.';ideas[0].tag='Just launched'}
+  if(goal==='urgency'){ideas[0].head='Your reminder to check this out';ideas[0].caption='Thinking about '+d.offer+'? Connect with '+d.business+' to check current availability and details.';ideas[0].tag='Your next step'}
+  if(goal==='education'){ideas[0].head='A quick tip from us to you';ideas[0].caption='Here is something worth knowing about '+d.offer+': '+(d.details||'ask us for a helpful tip tailored to your needs')+'. Follow '+d.business+' for more useful ideas.';ideas[0].tag='A helpful tip'}
+ }
+ if(platform==='story'){
+  ideas=ideas.map(x=>({...x,head:x.head.length>48?x.head.slice(0,45)+'…':x.head,caption:x.caption.length>125?x.caption.slice(0,122)+'…':x.caption}));
+ }
+ if(platform==='linkedin'){
+  ideas=ideas.map(x=>({...x,caption:x.caption.replace(/✨|👀/g,'').replace(/tag a friend, or stop by to say hello/,'share your perspective or contact us to learn more')}));
+ }
+ const results=$('ideaResults');results.innerHTML='';
+ ideas.forEach((idea,i)=>{
+  const card=document.createElement('article');card.className='idea-card';
+  const kicker=document.createElement('div');kicker.className='idea-kicker';kicker.textContent='ANGLE 0'+(i+1)+' · '+idea.kind;
+  const h=document.createElement('h3');h.textContent=idea.head;
+  const p=document.createElement('p');p.textContent=idea.caption;
+  const b=document.createElement('button');b.className='secondary smallbtn';b.type='button';b.textContent='Use this idea →';
+  b.addEventListener('click',()=>{ $('business').value=d.business==='Your business'?'':d.business;$('offer').value=d.offer==='something special'?'':d.offer;$('language').value=d.language;$('audience').value=d.audience==='your community'?'':d.audience;$('details').value=d.details;$('headlineEdit').value=idea.head;$('captionEdit').value=idea.caption;currentData={...currentData,...d,headline:idea.head,caption:idea.caption,tag:idea.tag,cta:isAr?'اكتشفوا المزيد':isFr?'DÉCOUVRIR':'LEARN MORE'};$('pTag').textContent=idea.tag;$('pCta').textContent=currentData.cta;renderPoster();showPage('create');notice('actionNotice','Idea added to your editor. Customize it before saving or downloading.')});
+  card.append(kicker,h,p,b);results.append(card);
+ });
+ notice('ideasNotice','Three campaign angles ready. Choose one to customize it in Create.');
+}
+$('makeIdeasBtn').addEventListener('click',buildIdeas);
+function createHashtags(){
+ const d=getWorkingData(),platform=$('ideaPlatform').value;
+ const source=(d.business+' '+d.offer+' '+d.audience).normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+ const words=source.split(/[^A-Za-z0-9\u0600-\u06FF]+/).filter(w=>w.length>2);
+ const tags=[];
+ words.forEach(w=>{const t='#'+w.replace(/[^\w\u0600-\u06FF]/g,'');if(t.length>3&&!tags.includes(t))tags.push(t)});
+ const general=d.language==='ar'?['#مشاريع_صغيرة','#دعم_المحلي','#تسوق_محلي']:d.language==='fr'?['#PetiteEntreprise','#CommerceLocal','#Decouverte']:['#SmallBusiness','#ShopLocal','#SupportSmallBusiness'];
+ general.forEach(t=>{if(!tags.includes(t))tags.push(t)});
+ if(platform==='instagram')tags.push(d.language==='ar'?'#انستغرام':d.language==='fr'?'#Inspiration':'#SmallBusinessLove');
+ const selected=tags.slice(0,10);$('tagResults').innerHTML='';
+ selected.forEach(tag=>{const span=document.createElement('span');span.className='tag-chip';span.textContent=tag;$('tagResults').append(span)});
+ $('tagResults').dataset.tags=selected.join(' ');
+ notice('tagNotice','Starter hashtags created. Remove anything that does not fit your post.');
+}
+$('makeTagsBtn').addEventListener('click',createHashtags);
+$('copyTagsBtn').addEventListener('click',async()=>{
+ const tags=$('tagResults').dataset.tags||'';
+ if(!tags){notice('tagNotice','Generate hashtags first.');return}
+ try{await navigator.clipboard.writeText(tags);notice('tagNotice','Hashtags copied.')}
+ catch(e){const ta=document.createElement('textarea');ta.value=tags;document.body.append(ta);ta.select();notice('tagNotice','Hashtags selected. Use your device copy command.');ta.remove()}
+});
+
+// CONTENT PLANNER: device-local plan items, status updates, and CSV export.
+function getPlans(){try{return JSON.parse(localStorage.getItem('postsprout_plans')||'[]')}catch(e){return []}}
+function setPlans(items){localStorage.setItem('postsprout_plans',JSON.stringify(items))}
+function renderPlanner(){
+ const list=$('plannerList'),items=getPlans().sort((a,b)=>a.date.localeCompare(b.date));list.innerHTML='';
+ if(!items.length){list.innerHTML='<div class="empty">Your planner is clear. Add one small post idea to get started.</div>';return}
+ items.forEach(item=>{
+  const row=document.createElement('div');row.className='saved-item planner-row';
+  const info=document.createElement('div');const strong=document.createElement('strong');strong.textContent=item.title;
+  const meta=document.createElement('div');meta.className='planner-meta';
+  [new Date(item.date+'T12:00:00').toLocaleDateString(undefined,{year:'numeric',month:'short',day:'numeric'}),item.platform,item.status].forEach(txt=>{const s=document.createElement('span');s.textContent=txt;meta.append(s)});
+  info.append(strong,meta);
+  const acts=document.createElement('div');acts.className='planner-actions';
+  const status=document.createElement('select');status.className='status-select';status.setAttribute('aria-label','Post status');
+  ['Planned','Drafting','Ready','Published'].forEach(s=>{const o=document.createElement('option');o.value=s;o.textContent=s;if(item.status===s)o.selected=true;status.append(o)});
+  status.addEventListener('change',()=>{const all=getPlans();const found=all.find(x=>x.id===item.id);if(found)found.status=status.value;setPlans(all);renderPlanner()});
+  const del=document.createElement('button');del.className='secondary smallbtn';del.type='button';del.textContent='Remove';del.addEventListener('click',()=>{setPlans(getPlans().filter(x=>x.id!==item.id));renderPlanner()});
+  acts.append(status,del);row.append(info,acts);list.append(row);
+ });
+}
+$('plannerForm').addEventListener('submit',e=>{
+ e.preventDefault();const title=$('planTitle').value.trim(),date=$('planDate').value;
+ if(!title||!date){notice('plannerNotice','Add a post idea and a date first.');return}
+ const items=getPlans();items.push({id:String(Date.now()),title,date,platform:$('planPlatform').value,status:'Planned',created:new Date().toISOString()});setPlans(items);
+ $('planTitle').value='';renderPlanner();notice('plannerNotice','Added to your content planner on this device.');
+});
+$('exportPlannerBtn').addEventListener('click',()=>{
+ const items=getPlans();if(!items.length){notice('plannerNotice','Add at least one plan before exporting.');return}
+ const quote=v=>'"'+String(v??'').replace(/"/g,'""')+'"';
+ const csv=['Title,Date,Platform,Status',...items.sort((a,b)=>a.date.localeCompare(b.date)).map(x=>[x.title,x.date,x.platform,x.status].map(quote).join(','))].join('\r\n');
+ const blob=new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8;'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='postsprout-content-plan.csv';a.click();URL.revokeObjectURL(url);notice('plannerNotice','Your planner CSV export is ready.');
+});
+$('clearPlannerBtn').addEventListener('click',()=>{
+ if(!getPlans().length){notice('plannerNotice','Your planner is already empty.');return}
+ if(confirm('Clear all planned posts from this device?')){setPlans([]);renderPlanner();notice('plannerNotice','Planner cleared.')}
+});
+const planDateInput=$('planDate');if(planDateInput&&!planDateInput.value)planDateInput.value=new Date(Date.now()-new Date().getTimezoneOffset()*60000).toISOString().slice(0,10);
+
+function loadBrandForm(){
+ const b=getBrand();if(!b)return;
+ $('brandName').value=b.name||'';$('brandType').value=b.type||'Other';$('brandAudience').value=b.audience||'';$('brandLanguage').value=b.language||'en';$('brandTone').value=b.tone||'friendly';$('brandDescription').value=b.description||'';
+}
+loadBrandForm();
+</script>
+</body>
+</html>
